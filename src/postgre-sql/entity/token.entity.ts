@@ -10,13 +10,14 @@ import { User_Nest_Auth } from './user.entity';
 @Entity()
 export class Token_Nest_Auth {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ nullable: true })
-  refresh_token: string;
+  user_ip_adress: string;
 
   @Column()
-  user_ip_adress: string;
+  refresh_token: string;
+
 
   @OneToOne((type) => User_Nest_Auth, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn()

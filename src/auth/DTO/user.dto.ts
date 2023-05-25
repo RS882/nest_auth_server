@@ -2,7 +2,7 @@ export class UserDTO {
   /**
    * user id
    */
-  id: number;
+  id: string;
   /**
    * user email
    */

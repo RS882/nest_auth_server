@@ -9,18 +9,18 @@ import {
 @Entity()
 export class User_Nest_Auth {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
-  @Column({ unique: true, nullable: true, length: 255 })
+  @Column({ unique: true, length: 255 })
   email: string;
 
-  @Column({ nullable: true })
+  @Column()
   pasword: string;
 
-  @Column({ default: false })
+  @Column({ default: false, nullable: true })
   is_activated: boolean;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   activation_link: string;
 
   @CreateDateColumn()
