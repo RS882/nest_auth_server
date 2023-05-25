@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
+export class User_Nest_Auth {
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column({ unique: true, nullable: true, length: 255 })

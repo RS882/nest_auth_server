@@ -5,11 +5,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { User_Nest_Auth } from './user.entity';
 
 @Entity()
-export class Token {
-  @PrimaryGeneratedColumn()
+export class Token_Nest_Auth {
+  @PrimaryGeneratedColumn('uuid')
   id: number;
 
   @Column({ nullable: true })
@@ -18,7 +18,7 @@ export class Token {
   @Column()
   user_ip_adress: string;
 
-  @OneToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
+  @OneToOne((type) => User_Nest_Auth, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn()
-  user_id: User;
+  user_id: User_Nest_Auth;
 }

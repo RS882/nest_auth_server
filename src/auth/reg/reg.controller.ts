@@ -11,8 +11,8 @@ export class RegController {
     return this.regService.reg(regUserDTO);
   }
 
-  // @Get('registration')
-  // getAll() {
-  // 	return this.regService.getAll();
-  // }
+  @Get('registration')
+  getAll() {
+    return this.regService.getAll();
+  }
 }
