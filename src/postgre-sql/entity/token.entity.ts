@@ -3,6 +3,7 @@ import {
   Column,
   JoinColumn,
   OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User_Nest_Auth } from './user.entity';
@@ -19,7 +20,6 @@ export class Token_Nest_Auth {
   refresh_token: string;
 
 
-  @OneToOne((type) => User_Nest_Auth, (user) => user.id, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @ManyToOne((type) => User_Nest_Auth, (user) => user.id, { onDelete: 'CASCADE' })
   user_id: User_Nest_Auth;
 }
