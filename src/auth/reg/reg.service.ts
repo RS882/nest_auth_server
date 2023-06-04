@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { env } from 'process';
 
 import { RegUserDTO } from './DTO/regUser.dto';
 import { User_Nest_Auth } from 'src/postgre-sql/entity/user.entity';
@@ -12,7 +13,8 @@ import { UserDTO } from '../DTO/user.dto';
 import { APIUserDTO } from '../DTO/apiUser.dto';
 import { Token_Nest_Auth } from 'src/postgre-sql/entity/token.entity';
 import { MailService } from '../mail/mail.service';
-import { env } from 'process';
+
+
 
 
 
@@ -68,6 +70,16 @@ export class RegService {
     return this.#getAPIUserDTO(findEmail[0])
   }
 
+  async logout(token: string): Promise<DeleteResult> {
+    return this.tokenRepository.delete({ refresh_token: token })
+  }
+
+  async activate(link: string): Promise<void> {
+    const findLink = await this.usersRepository.findBy({ activation_link: link })
+    if (findLink.length === 0) throw new BadRequestException(`Incorrect activation link`)
+    if (findLink.length > 1) throw new BadRequestException(`User data is duplicated`)
+    await this.usersRepository.update({ is_activated: true }, { activation_link: link })
+  }
 
   // async getAll() {
   //   return this.usersRepository.find();

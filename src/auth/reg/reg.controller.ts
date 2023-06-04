@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Get, Res, UseInterceptors } from '@nestjs/common';
-import { Response } from 'express';
+import { Body, Controller, Post, Get, Res, Req, UseInterceptors, HttpCode, HttpStatus, Param, Redirect } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 import { RegUserDTO } from './DTO/regUser.dto';
 import { RegService } from './reg.service';
 import { APIUserDTO } from '../DTO/apiUser.dto';
 import { RegInterceptor } from './reg.interceptor';
+import { env } from 'process';
 
 @Controller('auth')
 export class RegController {
@@ -30,6 +31,28 @@ export class RegController {
 
     const logUser: APIUserDTO = await this.regService.login(logUserDTO)
     return logUser
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response): Promise<void> {
+    const { refreshToken } = request.cookies;
+    await this.regService.logout(refreshToken)
+    response.clearCookie('refreshToken');
+    return;
+
+
+  }
+
+  @Get('activate')
+  @Redirect(env.CLIENT_URL!, HttpStatus.MOVED_PERMANENTLY)
+  async activate(@Param('link') link: string,): Promise<void> {
+    await this.regService.activate(link)
+
+    return;
+
   }
 
   // @Get('registration')
