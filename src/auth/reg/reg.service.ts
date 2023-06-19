@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -34,7 +34,9 @@ export class RegService {
   async #getAPIUserDTO(data: User_Nest_Auth, isNeedToSendMail = false): Promise<APIUserDTO> {
     const userRegData: UserDTO = { id: data.id, email: data.email, isActivate: data.is_activated }
     const tokens: TokensDTO = this.tokenService.generateTokens(userRegData)
+    await this.tokenRepository.delete({ user_id: data })
     const createdRefreshToken: Token_Nest_Auth = this.tokenRepository.create({ user_id: data, refresh_token: tokens.refreshToken })
+
     await this.tokenRepository.save(createdRefreshToken)
 
     if (isNeedToSendMail) await this.mailService.sendActivationLink(
@@ -75,12 +77,26 @@ export class RegService {
   }
 
   async activate(link: string): Promise<void> {
-    const findLink = await this.usersRepository.findBy({ activation_link: link })
+    const findLink: User_Nest_Auth[] = await this.usersRepository.findBy({ activation_link: link })
     if (findLink.length === 0) throw new BadRequestException(`Incorrect activation link`)
     if (findLink.length > 1) throw new BadRequestException(`User data is duplicated`)
     await this.usersRepository.update({ is_activated: true }, { activation_link: link })
   }
 
+  async refresh(token: string) {
+    if (!token) throw new UnauthorizedException(`The user is not authorized`)
+
+
+    const idValidToken: string | null = this.tokenService.validationRefreshToken(token)
+    if (!idValidToken) throw new UnauthorizedException(`The user is not authorized`)
+
+    const findToken: Token_Nest_Auth[] = await this.tokenRepository.findBy({ refresh_token: token })
+    if (findToken.length === 0) throw new UnauthorizedException(`The user is not authorized`)
+
+    const refreshData: User_Nest_Auth[] = await this.usersRepository.findBy({ id: idValidToken })
+
+    return this.#getAPIUserDTO(refreshData[0])
+  }
   // async getAll() {
   //   return this.usersRepository.find();
   // }

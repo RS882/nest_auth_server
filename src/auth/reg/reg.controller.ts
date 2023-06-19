@@ -19,6 +19,7 @@ export class RegController {
     @Body() regUserDTO: RegUserDTO): Promise<APIUserDTO> {
 
 
+
     const regNewUser: APIUserDTO = await this.regService.reg(regUserDTO)
 
     return regNewUser
@@ -53,6 +54,13 @@ export class RegController {
 
     return;
 
+  }
+  @Get('refresh')
+  async refresh(@Req() request: Request,) {
+    const { refreshToken } = request.cookies;
+
+    const refreshData: APIUserDTO = await this.regService.refresh(refreshToken)
+    return refreshData
   }
 
   // @Get('registration')

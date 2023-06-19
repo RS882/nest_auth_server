@@ -13,14 +13,36 @@ export class TokenService {
 
 		private readonly jwtService: JwtService
 	) { }
+
+	#validationToken(token: string, key: string): string | null {
+
+		const checkedToken = this.jwtService.verify(token, { secret: key });
+		return (typeof checkedToken === `object` && `id` in checkedToken) ?
+			checkedToken.id as string : null;
+	}
+
 	generateTokens(payload: UserDTO): TokensDTO {
 		const accessToken: string = this.jwtService.sign(payload, { secret: env.JWT_ACCESS_SECRET, expiresIn: '5m' })
 		const refreshToken: string = this.jwtService.sign(payload, { secret: env.JWT_REFRESH_SECRET, expiresIn: '15d' })
 
 		return { refreshToken, accessToken };
-
-
 	}
+
+	validationAccessToken(token: string): string | null {
+		try {
+			return this.#validationToken(token, env.JWT_ACCESS_SECRET!)
+		} catch (error) {
+			return null;
+		}
+	};
+
+	validationRefreshToken(token: string): string | null {
+		try {
+			return this.#validationToken(token, env.JWT_REFRESH_SECRET!)
+		} catch (error) {
+			return null;
+		}
+	};
 
 
 }

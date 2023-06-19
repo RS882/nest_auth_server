@@ -1,8 +1,7 @@
 import {
   Entity,
   Column,
-  JoinColumn,
-  OneToOne,
+
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
